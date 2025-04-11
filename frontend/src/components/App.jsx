@@ -3,9 +3,22 @@ import { routes } from '@/navigation/routes.jsx';
 import { UserProvider } from '@/context/UserContext';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ErrorBoundaryError from '@/components/ErrorBoundaryError';
-import { Home, LogIn } from 'lucide-react';
+import { createClient } from "@supabase/supabase-js";
+
+
+const supabase = createClient(process.env.ProjectUrl, process.env.AnonKey);
 
 export function App() {
+
+  const [instruments, setInstruments] = useState([]);
+  useEffect(() => {
+    getInstruments();
+  }, []);
+  async function getInstruments() {
+    const { data } = await supabase.from("instruments").select();
+    setInstruments(data);
+  }
+
   return (
     <UserProvider>
       <BrowserRouter>

@@ -8,13 +8,11 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ArrowLeft, Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react"
+import { ArrowLeft, Eye, EyeOff, AlertCircle, Loader2, Apple, Chrome } from "lucide-react"
 import { motion } from "framer-motion"
 
 export default function LoginPage() {
-
-    const navigate = useNavigate()
-  
+  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
@@ -60,6 +58,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col">
+      {/* Header */}
 
       <main className="flex-1 flex items-center justify-center p-4">
         <motion.div
@@ -72,7 +71,7 @@ export default function LoginPage() {
             <CardHeader className="space-y-1">
               <div className="flex justify-center mb-4">
                 <div className="bg-gradient-to-r from-blue-500 to-cyan-400 p-2 rounded-lg">
-                  <img
+                  <Image
                     src="/placeholder.svg?height=40&width=40"
                     alt="Logo"
                     width={40}
@@ -106,6 +105,15 @@ export default function LoginPage() {
                   />
                 </div>
                 <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    <Link
+                      to="/auth/forgot-password"
+                      className="text-xs text-blue-500 hover:text-blue-700 transition-colors"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
                   <div className="relative">
                     <Input
                       id="password"
@@ -135,7 +143,7 @@ export default function LoginPage() {
                     disabled={isLoading}
                   />
                   <Label htmlFor="rememberMe" className="text-sm font-normal cursor-pointer">
-                    Remember me
+                    Remember me for 30 days
                   </Label>
                 </div>
                 <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white" disabled={isLoading}>
@@ -156,9 +164,51 @@ export default function LoginPage() {
                   <div className="w-full border-t border-gray-200"></div>
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-white px-2 text-gray-500">OR</span>
+                  <span className="bg-white px-2 text-gray-500">OR CONTINUE WITH</span>
                 </div>
               </div>
+
+              <div className="grid grid-cols-2 gap-4 w-full">
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="flex items-center justify-center gap-2 border-gray-300 hover:bg-gray-50"
+                  onClick={() => {
+                    setIsLoading(true)
+                    // In a real app, you would implement Google OAuth here
+                    setTimeout(() => setIsLoading(false), 1500)
+                  }}
+                  disabled={isLoading}
+                >
+                  <Chrome className="h-4 w-4" />
+                  <span>Google</span>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="flex items-center justify-center gap-2 border-gray-300 hover:bg-gray-50"
+                  onClick={() => {
+                    setIsLoading(true)
+                    // In a real app, you would implement Apple OAuth here
+                    setTimeout(() => setIsLoading(false), 1500)
+                  }}
+                  disabled={isLoading}
+                >
+                  <Apple className="h-4 w-4" />
+                  <span>Apple</span>
+                </Button>
+              </div>
+
+              <div className="relative w-full">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-white px-2 text-gray-500">DON'T HAVE AN ACCOUNT?</span>
+                </div>
+              </div>
+
               <Button
                 variant="outline"
                 className="w-full border-blue-200 text-blue-700 hover:bg-blue-50"
@@ -178,4 +228,3 @@ export default function LoginPage() {
     </div>
   )
 }
-
