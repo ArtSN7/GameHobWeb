@@ -25,16 +25,11 @@ export function UserProvider({ children }) {
     const fetchUser = async () => {
       try {
         setIsLoading(true);
-        // Example: Fetch user from an API
-        // const response = await fetch('/api/user');
-        // if (!response.ok) throw new Error('Failed to fetch user');
-        // const userData = await response.json();
         
-        // Simulated user data (replace with real data)
-        const userData = { id: 1, name: 'John Doe', email: 'john@example.com' };
+        const userData = { id: 1, name: 'John Doe', email: 'john@example.com', balance: 100};
         
         setUser(userData); // Set user if logged in
-        // If not logged in, you could setUser(undefined);
+
       } catch (err) {
         setError(err.message);
         setUser(undefined); // No user logged in
@@ -44,18 +39,18 @@ export function UserProvider({ children }) {
     };
 
     fetchUser();
-  }, []); // Runs once on mount
+  }, []); 
 
   // Functions to update user state
   const login = async (credentials) => {
     try {
       setIsLoading(true);
       // Simulate login API call
-      // const response = await fetch('/api/login', { method: 'POST', body: JSON.stringify(credentials) });
-      // if (!response.ok) throw new Error('Login failed');
-      // const userData = await response.json();
+      const response = await fetch('/api/login', { method: 'POST', body: JSON.stringify(credentials) });
+      if (!response.ok) throw new Error('Login failed');
+      userData = await response.json();
       
-      const userData = { id: 1, name: 'John Doe', email: credentials.email };
+      userData = { id: 1, name: 'John Doe', email: credentials.email };
       setUser(userData);
       setError(null);
     } catch (err) {

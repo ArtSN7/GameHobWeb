@@ -6,18 +6,11 @@ import ErrorBoundaryError from '@/components/ErrorBoundaryError';
 import { createClient } from "@supabase/supabase-js";
 
 
-const supabase = createClient(process.env.ProjectUrl, process.env.AnonKey);
+//const supabase = createClient(process.env.ProjectUrl, process.env.AnonKey);
 
 export function App() {
 
-  const [instruments, setInstruments] = useState([]);
-  useEffect(() => {
-    getInstruments();
-  }, []);
-  async function getInstruments() {
-    const { data } = await supabase.from("instruments").select();
-    setInstruments(data);
-  }
+
 
   return (
     <UserProvider>
