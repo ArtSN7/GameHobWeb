@@ -1,20 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Coins } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {useUser} from "@/context/UserContext";
 
 
 export default function BalanceComponent() {
 
-  const { profile, isAuthenticated, isLoading } = useUser();
-  const [error, setError] = useState(null);
+  const { profile, isLoading } = useUser();
 
-  if (!isAuthenticated || !profile) {
-    return null;
-  }
-
-
-  if (isLoading) {
+  if (isLoading || !profile) {
     return (
       <section className="mb-12">
         <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm overflow-hidden rounded-2xl">
@@ -22,7 +16,7 @@ export default function BalanceComponent() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-medium text-[#64748b] mb-1">Your Balance</h2>
-                <p className="text-lg text-[#333333]">...</p>
+                <p className="text-lg text-[#333333]">Loading...</p>
               </div>
             </div>
           </CardContent>
@@ -31,22 +25,6 @@ export default function BalanceComponent() {
     );
   }
 
-  if (error) {
-    return (
-      <section className="mb-12">
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm overflow-hidden rounded-2xl">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-sm font-medium text-[#64748b] mb-1">Your Balance</h2>
-                <p className="text-lg text-red-500">{"Unable to load your balance now"}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-    );
-  }
 
   return (
     <section className="mb-12">

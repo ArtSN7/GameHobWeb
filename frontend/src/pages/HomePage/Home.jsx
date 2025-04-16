@@ -8,22 +8,22 @@ import {useUser} from "@/context/UserContext";
 
 import { useNavigate } from "react-router-dom";
 import LoadingPage from "../Utils/LoadingPage";
-import { use, useEffect } from "react";
 
 
 export default function HomePage() {
 
   const navigate = useNavigate();
 
-  const { user, profile, isAuthenticated, isLoading, updateBalance } = useUser();
+  const {isAuthenticated, isLoading} = useUser();
 
-  useEffect(() => {
-    if (isLoading) {
+  if (isLoading) {
       return <LoadingPage />;
-    }
-  }, [isLoading]);
+  }
 
-
+  if (!isAuthenticated) {
+      navigate("/login");
+      return null;
+  }
 
 
   return (

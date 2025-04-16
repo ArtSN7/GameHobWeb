@@ -44,17 +44,7 @@ export default function GameOptions() {
         icon={<Club className="h-5 w-5" />}
         color="#3b82f6"
         bgImage={blackjackImage}
-        imageName="blackjack.jpg"
         onPlay={playBlackjack} // Pass the function as a prop
-      />
-      <GameCard
-        title="Texas Hold'Em"
-        description="Poker game with community cards"
-        icon={<Heart className="h-5 w-5" />}
-        color="#8b5cf6"
-        bgImage={texasholdemImage}
-        imageName="poker.jpg"
-        onPlay={playTexasHoldEm} // Pass the function as a prop
       />
       <GameCard
         title="Slots"
@@ -62,7 +52,6 @@ export default function GameOptions() {
         icon={<Coins className="h-5 w-5" />}
         color="#f59e0b"
         bgImage={slotsImage}
-        imageName="slots.jpg"
         onPlay={playSlots} // Pass the function as a prop
       />
       <GameCard
@@ -71,7 +60,6 @@ export default function GameOptions() {
         icon={<Bomb className="h-5 w-5" />}
         color="#ec4899"
         bgImage={scratchImage}
-        imageName="minesweeper.jpg"
         onPlay={playScratchTheCard} // Pass the function as a prop
       />
       <GameCard
@@ -80,7 +68,6 @@ export default function GameOptions() {
         icon={<LoaderPinwheel className="h-5 w-5" />}
         color="#f6793b"
         bgImage={plinkoImage}
-        imageName="plinko.jpg"
         onPlay={playPlinko} // Pass the function as a prop
       />
     </div>
@@ -88,7 +75,7 @@ export default function GameOptions() {
 }
 
 // Modern Minimalistic Game Card Component
-function GameCard({ title, description, icon, color, bgImage, imageName, onPlay }) {
+function GameCard({ title, description, icon, color, bgImage, onPlay }) {
   return (
     <Card className="overflow-hidden border-0 shadow-sm rounded-xl h-full transition-all hover:shadow-md group">
       <CardContent className="p-0">

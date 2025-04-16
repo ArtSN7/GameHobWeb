@@ -21,7 +21,13 @@ export default function SignUpPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirect if already authenticated
+
+  // Redirect authenticated users after render
+  useEffect(() => {
+    if (isAuthenticated && !contextLoading) {
+      navigate("/home");
+    }
+  }, [isAuthenticated, contextLoading, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
