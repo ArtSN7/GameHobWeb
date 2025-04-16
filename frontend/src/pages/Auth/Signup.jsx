@@ -1,45 +1,73 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ArrowLeft, Eye, EyeOff, AlertCircle, Loader2, Apple, Chrome, Spade } from "lucide-react"
-import { motion } from "framer-motion"
-
-export default function LoginPage() {
-  const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false)
-
-  const [form_email, setFormEmail] = useState("")
-  const [form_password, setFormPassword] = useState("")
-
-  const [error, setError] = useState("")
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Loader2, Apple, Chrome, Spade } from "lucide-react";
+import { motion } from "framer-motion";
+import { supabase } from "@/lib/supabase";
+import { useUser } from "@/context/UserContext";
 
 
+export default function SignUpPage() {
+  const navigate = useNavigate();
+  const { isAuthenticated, isLoading: contextLoading } = useUser();
+  const [formEmail, setFormEmail] = useState("");
+  const [formPassword, setFormPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Redirect if already authenticated
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
-    if (!formData.email || !formData.password) {
-      setError("Please fill in all fields")
-      return
+    if (!formEmail || !formPassword) {
+      setError("Please fill in all fields");
+      return;
     }
 
     try {
-      setIsLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      navigate("/")
+      setIsLoading(true);
+      const { error } = await supabase.auth.signUp({
+        email: formEmail,
+        password: formPassword,
+      });
+
+      if (error) throw error;
+      navigate("/home"); // Redirect to homepage after successful sign-up
     } catch (err) {
-      setError("Invalid email or password")
+      setError(err.message || "Failed to create account");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
+  };
+
+  const handleOAuthLogin = async (provider) => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (err) {
+      setError(err.message || `Failed to sign up with ${provider}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (contextLoading) {
+    return <div>Loading...</div>;
   }
 
   return (
@@ -58,8 +86,9 @@ export default function LoginPage() {
                   <Spade className="h-10 w-10 text-white" />
                 </div>
               </div>
-              <CardTitle className="text-xl sm:text-2xl font-bold text-center">Log in</CardTitle>
+              <CardTitle className="text-xl sm:text-2xl font-bold text-center">Create Account</CardTitle>
             </CardHeader>
+
             <CardContent>
               {error && (
                 <Alert variant="destructive" className="mb-4 text-sm">
@@ -75,7 +104,7 @@ export default function LoginPage() {
                     name="email"
                     type="email"
                     placeholder="name@example.com"
-                    value={form_email}
+                    value={formEmail}
                     onChange={(e) => setFormEmail(e.target.value)}
                     disabled={isLoading}
                     required
@@ -90,9 +119,9 @@ export default function LoginPage() {
                     <Input
                       id="password"
                       name="password"
-                      type={"text"}
+                      type="password"
                       placeholder="••••••••"
-                      value={form_password}
+                      value={formPassword}
                       onChange={(e) => setFormPassword(e.target.value)}
                       disabled={isLoading}
                       required
@@ -101,13 +130,12 @@ export default function LoginPage() {
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
-                  {"*By signing in, you agree to our "}
-                  <Link to="/terms" className="text-blue-500 hover:underline">
-                    Terms of Service
-                  </Link>
-                  
-                </p>
+                  <p className="text-sm text-muted-foreground">
+                    {"*By signing up, you agree to our "}
+                    <a href="/terms" className="text-blue-500 hover:underline">
+                      Terms of Service
+                    </a>
+                  </p>
                 </div>
                 <Button
                   type="submit"
@@ -117,15 +145,16 @@ export default function LoginPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Logging in...
+                      Creating account...
                     </>
                   ) : (
-                    "Log in"
+                    "Create account"
                   )}
                 </Button>
               </form>
             </CardContent>
-            <CardFooterComp isLoading={isLoading} setIsLoading={setIsLoading}/>
+
+            <CardFooterComp isLoading={isLoading} handleOAuthLogin={handleOAuthLogin} />
           </Card>
         </motion.div>
       </main>
@@ -133,67 +162,60 @@ export default function LoginPage() {
       <footer className="py-4 text-center text-xs sm:text-sm text-[#64748b]">
         <p>© {new Date().getFullYear()} GameHub. All rights reserved.</p>
       </footer>
-
     </div>
-  )
+  );
 }
 
+function CardFooterComp({ isLoading, handleOAuthLogin }) {
+  const navigate = useNavigate();
 
-
-function CardFooterComp({ isLoading, setIsLoading }) {
   return (
     <CardFooter className="flex flex-col space-y-3 sm:space-y-4">
-    <div className="relative w-full">
-      <div className="absolute inset-0 flex items-center">
-        <div className="w-full border-t border-gray-200"></div>
+      <div className="relative w-full">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-200"></div>
+        </div>
+        <div className="relative flex justify-center text-xs sm:text-sm">
+          <span className="bg-white px-2 text-gray-500">OR CONTINUE WITH</span>
+        </div>
       </div>
-      <div className="relative flex justify-center text-xs sm:text-sm">
-        <span className="bg-white px-2 text-gray-500">OR CONTINUE WITH</span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
+        <Button
+          variant="outline"
+          type="button"
+          className="flex items-center justify-center gap-2 border-gray-300 hover:bg-gray-50 h-12 sm:h-10 text-sm sm:text-base"
+          onClick={() => handleOAuthLogin("google")}
+          disabled={isLoading}
+        >
+          <Chrome className="h-4 w-4" />
+          <span>Google</span>
+        </Button>
+        <Button
+          variant="outline"
+          type="button"
+          className="flex items-center justify-center gap-2 border-gray-300 hover:bg-gray-50 h-12 sm:h-10 text-sm sm:text-base"
+          onClick={() => handleOAuthLogin("apple")}
+          disabled={true} // change to isLoading when the apple reg is done
+        >
+          <Apple className="h-4 w-4" />
+          <span>Apple</span>
+        </Button>
       </div>
-    </div>
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
+      <div className="relative w-full">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-200"></div>
+        </div>
+        <div className="relative flex justify-center text-xs sm:text-sm">
+          <span className="bg-white px-2 text-gray-500">ALREADY HAVE AN ACCOUNT?</span>
+        </div>
+      </div>
       <Button
         variant="outline"
-        type="button"
-        className="flex items-center justify-center gap-2 border-gray-300 hover:bg-gray-50 h-12 sm:h-10 text-sm sm:text-base"
-        onClick={() => {
-          setIsLoading(true)
-          setTimeout(() => setIsLoading(false), 1500)
-        }}
-        disabled={isLoading}
+        className="w-full border-blue-200 text-blue-700 hover:bg-blue-50 h-12 sm:h-10 text-sm sm:text-base"
+        onClick={() => navigate("/auth/login")}
       >
-        <Chrome className="h-4 w-4" />
-        <span>Google</span>
+        Log in
       </Button>
-      <Button
-        variant="outline"
-        type="button"
-        className="flex items-center justify-center gap-2 border-gray-300 hover:bg-gray-50 h-12 sm:h-10 text-sm sm:text-base"
-        onClick={() => {
-          setIsLoading(true)
-          setTimeout(() => setIsLoading(false), 1500)
-        }}
-        disabled={isLoading}
-      >
-        <Apple className="h-4 w-4" />
-        <span>Apple</span>
-      </Button>
-    </div>
-    <div className="relative w-full">
-      <div className="absolute inset-0 flex items-center">
-        <div className="w-full border-t border-gray-200"></div>
-      </div>
-      <div className="relative flex justify-center text-xs sm:text-sm">
-        <span className="bg-white px-2 text-gray-500">DON'T HAVE AN ACCOUNT?</span>
-      </div>
-    </div>
-    <Button
-      variant="outline"
-      className="w-full border-blue-200 text-blue-700 hover:bg-blue-50 h-12 sm:h-10 text-sm sm:text-base"
-      onClick={() => navigate("/auth/signup")}
-    >
-      Create an account
-    </Button>
-  </CardFooter>
-  )
+    </CardFooter>
+  );
 }

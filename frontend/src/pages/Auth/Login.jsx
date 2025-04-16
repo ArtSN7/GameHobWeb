@@ -1,64 +1,31 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Loader2, Apple, Chrome, Spade } from "lucide-react"
-import { motion } from "framer-motion"
-
-
-import { supabase } from "@/lib/supabase"; // Import Supabase client
-
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Loader2, Apple, Chrome, Spade } from "lucide-react";
+import { motion } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 import { useUser } from "@/context/UserContext";
 
-import LoadingPage from "../Utils/LoadingPage.jsx";
-
-
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false)
-
-  const [form_email, setFormEmail] = useState("")
-  const [form_password, setFormPassword] = useState("")
-
-  const [error, setError] = useState("")
-
+  const navigate = useNavigate();
   const { isAuthenticated, isLoading: contextLoading } = useUser();
+  const [formEmail, setFormEmail] = useState("");
+  const [formPassword, setFormPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  if (contextLoading) {
-    return <LoadingPage />;
-  }
-
-  // Redirect if already authenticated
-  if (isAuthenticated && !contextLoading) {
-    navigate("/home");
-  }
-  
-  const handleOAuthLogin = async (provider) => {
-    try {
-      setIsLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/`, // Redirect after login
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-    } catch (err) {
-      setError(err.message || `Failed to login with ${provider}`);
-    } finally {
-      setIsLoading(false);
+  // Redirect authenticated users after render
+  useEffect(() => {
+    if (isAuthenticated && !contextLoading) {
+      navigate("/home");
     }
-  };
-
-
+  }, [isAuthenticated, contextLoading, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,17 +43,35 @@ export default function LoginPage() {
         password: formPassword,
       });
 
-      if (error) {
-        throw error;
-      }
-
-      navigate("/");
+      if (error) throw error;
     } catch (err) {
       setError(err.message || "Invalid email or password");
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleOAuthLogin = async (provider) => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (err) {
+      setError(err.message || `Failed to login with ${provider}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (contextLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col">
@@ -107,17 +92,17 @@ export default function LoginPage() {
               <CardTitle className="text-xl sm:text-2xl font-bold text-center">Log in</CardTitle>
             </CardHeader>
 
-            <CardMainComp 
+            <CardMainComp
               isLoading={isLoading}
-              form_email={form_email}
+              formEmail={formEmail}
               setFormEmail={setFormEmail}
-              form_password={form_password}
+              formPassword={formPassword}
               setFormPassword={setFormPassword}
               handleSubmit={handleSubmit}
               error={error}
             />
 
-            <CardFooterComp isLoading={isLoading} handleOAuthLogin={handleOAuthLogin}/>
+            <CardFooterComp isLoading={isLoading} handleOAuthLogin={handleOAuthLogin} />
           </Card>
         </motion.div>
       </main>
@@ -125,76 +110,78 @@ export default function LoginPage() {
       <footer className="py-4 text-center text-xs sm:text-sm text-[#64748b]">
         <p>© {new Date().getFullYear()} GameHub. All rights reserved.</p>
       </footer>
-
     </div>
-  )
+  );
 }
 
-
-function CardMainComp({ isLoading, form_email, setFormEmail, form_password, setFormPassword, handleSubmit, error }) {
+function CardMainComp({
+  isLoading,
+  formEmail,
+  setFormEmail,
+  formPassword,
+  setFormPassword,
+  handleSubmit,
+  error,
+}) {
   return (
     <CardContent>
-    {error && (
-      <Alert variant="destructive" className="mb-4 text-sm">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
-    )}
-    <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-      <div className="space-y-1.5 sm:space-y-2">
-        <Label htmlFor="email" className="text-sm sm:text-base">Email</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="name@example.com"
-          value={form_email}
-          onChange={(e) => setFormEmail(e.target.value)}
-          disabled={isLoading}
-          required
-          className="h-12 sm:h-10 text-sm sm:text-base"
-        />
-      </div>
-      <div className="space-y-1.5 sm:space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password" className="text-sm sm:text-base">Password</Label>
-        </div>
-        <div className="relative">
+      {error && (
+        <Alert variant="destructive" className="mb-4 text-sm">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+        <div className="space-y-1.5 sm:space-y-2">
+          <Label htmlFor="email" className="text-sm sm:text-base">Email</Label>
           <Input
-            id="password"
-            name="password"
-            type={"text"}
-            placeholder="••••••••"
-            value={form_password}
-            onChange={(e) => setFormPassword(e.target.value)}
+            id="email"
+            name="email"
+            type="email"
+            placeholder="name@example.com"
+            value={formEmail}
+            onChange={(e) => setFormEmail(e.target.value)}
             disabled={isLoading}
             required
             className="h-12 sm:h-10 text-sm sm:text-base"
           />
         </div>
-      </div>
-      <Button
-        type="submit"
-        className="w-full bg-blue-500 hover:bg-blue-600 text-white h-12 sm:h-10 text-sm sm:text-base"
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Logging in...
-          </>
-        ) : (
-          "Log in"
-        )}
-      </Button>
-    </form>
-  </CardContent>
-  )
+        <div className="space-y-1.5 sm:space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password" className="text-sm sm:text-base">Password</Label>
+          </div>
+          <div className="relative">
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              value={formPassword}
+              onChange={(e) => setFormPassword(e.target.value)}
+              disabled={isLoading}
+              required
+              className="h-12 sm:h-10 text-sm sm:text-base"
+            />
+          </div>
+        </div>
+        <Button
+          type="submit"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white h-12 sm:h-10 text-sm sm:text-base"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Logging in...
+            </>
+          ) : (
+            "Log in"
+          )}
+        </Button>
+      </form>
+    </CardContent>
+  );
 }
-
-
-
-
 
 function CardFooterComp({ isLoading, handleOAuthLogin }) {
   const navigate = useNavigate();

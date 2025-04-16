@@ -4,7 +4,7 @@ import { Menu, Spade, X } from "lucide-react"; // Added X for closing the menu
 
 import { useState } from "react";
 
-import { useUser } from './../../components/App'; // Adjust path if needed
+import {useUser} from "@/context/UserContext";
 
 export default function Header() {
   const { user, isLoading, error, logout } = useUser();
@@ -16,7 +16,7 @@ export default function Header() {
   }
 
   if (!user){
-    navigate('/login');
+    navigate('/auth/login');
   }
 
 

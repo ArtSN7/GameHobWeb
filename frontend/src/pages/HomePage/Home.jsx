@@ -4,8 +4,27 @@ import Footer from "../Utils/Footer"
 import BalanceComponent from "./BalanceComponent"
 import GameOptions from "./GameOptions"
 
+import {useUser} from "@/context/UserContext";
+
+import { useNavigate } from "react-router-dom";
+import LoadingPage from "../Utils/LoadingPage";
+import { use, useEffect } from "react";
+
 
 export default function HomePage() {
+
+  const navigate = useNavigate();
+
+  const { user, profile, isAuthenticated, isLoading, updateBalance } = useUser();
+
+  useEffect(() => {
+    if (isLoading) {
+      return <LoadingPage />;
+    }
+  }, [isLoading]);
+
+
+
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a]">

@@ -1,7 +1,9 @@
-import LoginPage from '../pages/Auth/Login.jsx';
+import LoginPage from '@/pages/Auth/Login.jsx';
 import SignupPage from '@/pages/Auth/Signup.jsx';
 
-import NotFound from '../pages/Utils/NotFound.jsx';
+import HomePage from '@/pages/HomePage/Home.jsx';
+
+import NotFound from '@/pages/Utils/NotFound.jsx';
 
 
 
@@ -11,6 +13,9 @@ export const routes = [
   { path: '/', Component: LoginPage },
   { path: '/auth/login', Component: LoginPage },
   { path: '/auth/signup', Component: SignupPage },
+
+  // main page
+  { path: '/home', Component: HomePage },
 
 
   // errors

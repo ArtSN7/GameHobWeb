@@ -1,35 +1,55 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
-// Create the context
 const UserContext = createContext();
 
-// Context provider
 export function UserProvider({ children }) {
-  const [user, setUser] = useState(null); // Supabase auth user
-  const [profile, setProfile] = useState(null); // Data from `users` table
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch user profile from `users` table
   const fetchUserProfile = async (userId) => {
     try {
-      const { data, error } = await supabase
+      // Try to fetch the user profile
+      let { data, error } = await supabase
         .from("users")
         .select("id, email, balance, level, created_at")
-        .eq("id", userId)
-        .single();
+        .eq("id", userId);
 
       if (error) throw error;
-      setProfile(data);
+
+      if (!data || data.length === 0) {
+        // No row found, create a default profile
+        const { data: newProfile, error: insertError } = await supabase
+          .from("users")
+          .insert({
+            id: userId,
+            email: (await supabase.auth.getUser()).data.user.email,
+            balance: 10000.0,
+            level: 1,
+            created_at: new Date().toISOString(),
+          })
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+        setProfile(newProfile);
+      } else if (data.length > 1) {
+        // Multiple rows found, log warning and use the first row
+        console.warn(`Multiple rows found for user ID ${userId}. Using the first row.`);
+        setProfile(data[0]);
+      } else {
+        // Exactly one row found
+        setProfile(data[0]);
+      }
     } catch (error) {
       console.error("Error fetching user profile:", error.message);
+      setProfile(null); // Ensure profile is null on error
     }
   };
 
-  // Listen for auth state changes
   useEffect(() => {
-    // Check initial session
     const initializeSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -42,7 +62,6 @@ export function UserProvider({ children }) {
 
     initializeSession();
 
-    // Subscribe to auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === "SIGNED_IN") {
@@ -58,13 +77,11 @@ export function UserProvider({ children }) {
       }
     );
 
-    // Cleanup subscription
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
 
-  // Function to update balance (e.g., after a game)
   const updateBalance = async (newBalance) => {
     if (!user) return;
 
@@ -81,7 +98,6 @@ export function UserProvider({ children }) {
     }
   };
 
-  // Context value
   const value = {
     user,
     profile,
@@ -93,7 +109,6 @@ export function UserProvider({ children }) {
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
-// Custom hook to use the context
 export function useUser() {
   const context = useContext(UserContext);
   if (!context) {

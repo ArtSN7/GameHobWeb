@@ -5,15 +5,6 @@ import { ArrowLeft, Search } from "lucide-react"
 export default function NotFoundPage() {
   return (
     <div className="min-h-screen bg-[#fafafa] text-[#333333]">
-      {/* Header */}
-      <header className="sticky top-0 z-10 backdrop-blur-xl bg-white/80 shadow-sm">
-        <div className="container flex items-center justify-between h-16 px-4">
-          <Link href="/" className="flex items-center text-[#666666] hover:text-blue-500 transition-colors">
-            <ArrowLeft className="h-5 w-5 mr-2" />
-            <span className="text-sm font-medium">Back to Home</span>
-          </Link>
-        </div>
-      </header>
 
       <main className="container px-4 py-8 max-w-md mx-auto">
         <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
