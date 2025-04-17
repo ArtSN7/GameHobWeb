@@ -8,6 +8,7 @@ export function UserProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [balance, setBalance] = useState(0);
 
   const fetchUserProfile = async (userId) => {
     try {
@@ -43,6 +44,9 @@ export function UserProvider({ children }) {
         // Exactly one row found
         setProfile(data[0]);
       }
+
+      setBalance(data[0].balance);
+
     } catch (error) {
       console.error("Error fetching user profile:", error.message);
       setProfile(null); // Ensure profile is null on error
@@ -103,6 +107,8 @@ export function UserProvider({ children }) {
     profile,
     isAuthenticated,
     isLoading,
+    balance,
+    setBalance,
     updateBalance,
   };
 

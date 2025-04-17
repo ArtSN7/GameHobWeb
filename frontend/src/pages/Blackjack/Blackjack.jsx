@@ -6,8 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import BettingInput from "../Utils/BettingInput";
 import BlackJackBtns from "./BlackJackBtns";
 import InGameHeader from "../Utils/InGameHeader";
-import {useUser} from "@/context/UserContext";
-
+import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
 import LoadingPage from "../Utils/LoadingPage";
 
@@ -29,10 +28,8 @@ const GAME_STATE = {
 };
 
 export default function BlackjackPage() {
-
   const navigate = useNavigate();
-
-  const { user, profile, error, isLoading, isAuthenticated } = useUser();
+  const { user, profile, error, isLoading, isAuthenticated, setBalance, balance, updateBalance } = useUser();
 
   const [deck, setDeck] = useState([]);
   const [playerHands, setPlayerHands] = useState([[]]);
@@ -44,49 +41,41 @@ export default function BlackjackPage() {
   const [message, setMessage] = useState("Place your bet to start the game");
   const [bet, setBet] = useState(100);
   const [handBets, setHandBets] = useState([100]);
-  const [balance, setBalance] = useState(0);
   const [result, setResult] = useState(null);
   const [lastWin, setLastWin] = useState(0);
   const [insuranceBet, setInsuranceBet] = useState(0);
-
-  if (!isAuthenticated) { // if not authenticated, redirect to login
-    navigate("/auth/login");
-    return;
-  }
-
-  if (isLoading){ // if it is loading
-    return <LoadingPage />
-  }
-
-  // Consolidated game stats
   const [gameStats, setGameStats] = useState({
     gamesPlayed: 0,
     gamesWon: 0,
     blackjackTotalWin: 0,
   });
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/auth/login");
+      return;
+    }
+  }, [isAuthenticated]);
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
 
   useEffect(() => {
     initializeGame();
   }, []);
 
-  // Update backend only when game ends
+  // Update backend when game ends
+  const updateBackend = async () => {
+    await updateBalance(balance);
+  };
+
   useEffect(() => {
-
     if (gameState === GAME_STATE.GAME_OVER) {
-
-      // updateBackend();
-
-      setGameStats({
-        gamesPlayed: 0,
-        gamesWon: 0,
-        blackjackTotalWin: 0,
-      })
-
+      updateBackend();
     }
-  }, [gameState]);
+  }, [gameState, balance]);
 
-  // used to create a deck of cards
   const createDeck = () => {
     const newDeck = [];
     const numberOfDecks = 6;
@@ -97,11 +86,9 @@ export default function BlackjackPage() {
         }
       }
     }
-    const shuffledDeck = shuffleDeck(newDeck);
-    return shuffledDeck;
+    return shuffleDeck(newDeck);
   };
 
-  // used to shuffle the deck
   const shuffleDeck = (deck) => {
     const shuffled = [...deck];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -111,9 +98,7 @@ export default function BlackjackPage() {
     return shuffled;
   };
 
-  // initialising the game
   const initializeGame = () => {
-
     const newDeck = createDeck();
     setDeck(newDeck);
     setPlayerHands([[]]);
@@ -128,7 +113,6 @@ export default function BlackjackPage() {
     setHandBets([bet]);
     setInsuranceBet(0);
   };
-
 
   const calculateScore = (hand) => {
     let score = 0;
@@ -165,7 +149,11 @@ export default function BlackjackPage() {
       ...prev,
       gamesPlayed: prev.gamesPlayed + 1,
     }));
-    setBalance((prev) => prev - bet);
+    
+    setBalance((prev) => {
+      const newBalance = prev - bet;
+      return newBalance >= 0 ? newBalance : prev;
+    });
 
     let localDeck = [...deck];
     if (localDeck.length < 26) {
@@ -192,10 +180,8 @@ export default function BlackjackPage() {
 
     setPlayerScores([newPlayerScore]);
     setDealerScore(newDealerScore);
-
     setLastWin(0);
     setResult(null);
-
     setDeck(localDeck);
 
     const playerHasBlackjack = newPlayerScore === 21 && newPlayerHand.length === 2;
@@ -252,7 +238,6 @@ export default function BlackjackPage() {
     const newScores = [...playerScores];
     newScores[activeHandIndex] = newScore;
     setPlayerScores(newScores);
-
     setDeck(localDeck);
 
     if (newScore > 21) {
@@ -288,7 +273,10 @@ export default function BlackjackPage() {
       !playerHands[activeHandIndex] ||
       playerHands[activeHandIndex].length !== 2 ||
       balance < handBets[activeHandIndex]
-    ) return;
+    ) {
+      setMessage("Cannot double down: Invalid hand or insufficient balance.");
+      return;
+    }
 
     const doubleAmount = handBets[activeHandIndex];
     setBalance((prev) => prev - doubleAmount);
@@ -312,7 +300,6 @@ export default function BlackjackPage() {
     const newScores = [...playerScores];
     newScores[activeHandIndex] = newScore;
     setPlayerScores(newScores);
-
     setDeck(localDeck);
 
     if (activeHandIndex < newHands.length - 1) {
@@ -337,12 +324,17 @@ export default function BlackjackPage() {
       return;
     }
 
-    setBalance((prev) => prev - handBets[activeHandIndex]);
+    const splitBet = handBets[activeHandIndex];
+    if (splitBet > balance) {
+      setMessage("Not enough chips to split.");
+      return;
+    }
+
+    setBalance((prev) => prev - splitBet);
 
     let localDeck = [...deck];
     if (localDeck.length < 26) {
       localDeck = createDeck();
-      console.log("Deck reshuffled during split");
     }
 
     const card1 = localDeck[0];
@@ -355,12 +347,11 @@ export default function BlackjackPage() {
     newHands.push([currentHand[1], card2]);
     setPlayerHands(newHands);
 
-    const newHandBets = [...handBets, handBets[activeHandIndex]];
+    const newHandBets = [...handBets, splitBet];
     setHandBets(newHandBets);
 
     const newScores = newHands.map((hand) => calculateScore(hand));
     setPlayerScores(newScores);
-
     setDeck(localDeck);
 
     setMessage(`Split into ${newHands.length} hands. Playing Hand ${activeHandIndex + 1} now.`);
@@ -372,6 +363,7 @@ export default function BlackjackPage() {
       !playerHands[activeHandIndex] ||
       playerHands[activeHandIndex].length !== 2
     ) return;
+
     setGameState(GAME_STATE.GAME_OVER);
     const refund = Math.floor(handBets[activeHandIndex] / 2);
     setBalance((prev) => prev + refund);
@@ -395,16 +387,13 @@ export default function BlackjackPage() {
       if (currentDealerScore < 17 || (currentDealerScore === 17 && isSoftSeventeen(currentDealerHand))) {
         if (localDeck.length < 26) {
           localDeck = createDeck();
-          console.log("Deck reshuffled during dealer turn");
         }
 
         if (localDeck.length === 0) {
-          console.error("Deck is empty! Forcing a reshuffle.");
           localDeck = createDeck();
         }
 
         const card = localDeck[0];
-        console.log(`Dealer draws: ${card.value}${card.suit}`);
         localDeck = localDeck.slice(1);
 
         currentDealerHand = [...currentDealerHand, card];
@@ -478,16 +467,18 @@ export default function BlackjackPage() {
     setGameStats((prev) => ({
       ...prev,
       gamesWon: netResult > 0 ? prev.gamesWon + 1 : prev.gamesWon,
-      blackjackTotalWin: netResult > 0 ? prev.blackjackTotalWin + netResult : prev.blackjackTotalWin + 0,
+      blackjackTotalWin: netResult > 0 ? prev.blackjackTotalWin + netResult : prev.blackjackTotalWin,
     }));
 
-    setBalance((prev) => prev + netResult);
+    setBalance((prev) => {
+      const newBalance = prev + totalWin;
+      return newBalance >= 0 ? newBalance : prev;
+    });
+
     setMessage(finalMessage.join(" "));
     setLastWin(netResult);
     setResult(netResult > 0 ? "win" : netResult < 0 ? "lose" : "push");
     setDealerScore(dScore);
-
-
   };
 
   const isBetValid = () => bet >= 10 && bet <= balance;
@@ -523,7 +514,6 @@ export default function BlackjackPage() {
     return "bg-blue-100 text-blue-700";
   };
 
-  // rules for the GuidePopUp
   const BlackJackDescription = (
     <>
       <div>
@@ -562,10 +552,9 @@ export default function BlackjackPage() {
     </>
   );
 
-
   return (
     <div className="min-h-screen bg-[#fafafa] text-[#333333] flex flex-col">
-      <InGameHeader coins={balance} IsShowGuide={true} title={"BlackJack Rules"} description={BlackJackDescription} />
+      <InGameHeader IsShowGuide={true} title={"BlackJack Rules"} description={BlackJackDescription} />
 
       <main className="flex-grow container px-4 py-6 md:py-8 mx-auto w-full">
         <div className="text-center mb-6 md:mb-10">
@@ -660,7 +649,7 @@ export default function BlackjackPage() {
             <div className="flex flex-col items-center gap-4 md:gap-6">
               {(gameState === GAME_STATE.BETTING || gameState === GAME_STATE.GAME_OVER) && (
                 <div className="flex flex-col items-center gap-4 w-full max-w-sm">
-                  <BettingInput bet={bet} setBet={setBet} balance={balance} gameState={gameState} />
+                  <BettingInput bet={bet} setBet={setBet} gameState={gameState} />
                   <Button
                     className="bg-blue-500 hover:bg-blue-600 w-32 py-2 md:py-3 rounded-lg text-white font-medium text-sm md:text-base"
                     onClick={startGame}
@@ -676,6 +665,7 @@ export default function BlackjackPage() {
                   <Button
                     className="bg-blue-500 hover:bg-blue-600 flex-1 py-4 md:py-6 rounded-xl text-white font-medium text-sm md:text-base"
                     onClick={() => handleInsurance(true)}
+                    disabled={Math.floor(bet / 2) > balance}
                   >
                     Insurance
                   </Button>

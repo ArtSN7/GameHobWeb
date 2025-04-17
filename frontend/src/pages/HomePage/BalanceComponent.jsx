@@ -6,7 +6,7 @@ import {useUser} from "@/context/UserContext";
 
 export default function BalanceComponent() {
 
-  const { profile, isLoading } = useUser();
+  const { profile, isLoading, balance } = useUser();
 
   if (isLoading || !profile) {
     return (
@@ -35,7 +35,7 @@ export default function BalanceComponent() {
               <h2 className="text-sm font-medium text-[#64748b] mb-1">Your Balance</h2>
               <p className="text-3xl font-bold flex items-center">
                 <Coins className="h-5 w-5 mr-2 text-blue-500" />
-                {profile.balance}
+                {balance}
               </p>
             </div>
           </div>

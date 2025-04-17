@@ -2,10 +2,15 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import { ArrowLeft, Coins} from "lucide-react"
 
+import { useUser } from "@/context/UserContext"
+
 
 import GuidePopUp from "./GuidePopUp"
 
-export default function InGameHeader({ coins, IsShowGuide, title, description }) {
+export default function InGameHeader({ IsShowGuide, title, description }) {
+
+    const {balance} = useUser()
+
     const [showGuide, setShowGuide] = useState(false)
 
     return (
@@ -32,7 +37,7 @@ export default function InGameHeader({ coins, IsShowGuide, title, description })
                     {/* Money count and Dialog button container */}
                     <div className="flex items-center gap-2">
                         <Coins className="h-4 w-4 text-yellow-500" />
-                        <span className="font-medium">{coins.toLocaleString()}</span>
+                        <span className="font-medium">{balance.toLocaleString()}</span>
                     </div>
                 </div>
             </div>

@@ -2,9 +2,14 @@
 import { Button } from "@/components/ui/button";
 import {  Plus, Minus } from "lucide-react";
 
+import { useUser } from "@/context/UserContext";
+
 
 // pass RUNNING instead of a gameState ( when the game is in progress ) in parent components
-export default function BettingInput({ bet, setBet, balance, gameState }) {
+export default function BettingInput({ bet, setBet,  gameState }) {
+
+    const { balance } = useUser();
+
     // Increase bet
     const increaseBet = () => {
         if (gameState === "RUNNING") return;
