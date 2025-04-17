@@ -5,13 +5,14 @@ import { Menu, Spade, X } from "lucide-react"; // Added X for closing the menu
 import { useState } from "react";
 
 import {useUser} from "@/context/UserContext";
+import { p } from "framer-motion/client";
 
 export default function Header() {
-  const { user, isLoading, error, logout } = useUser();
+  const { user, isLoading, error, logout, profile } = useUser();
 
   const navigate = useNavigate();
 
-  if (isLoading) {
+  if (isLoading || profile === null) {
     return null; // or a loading spinner
   }
 
@@ -35,7 +36,7 @@ export default function Header() {
         <div className="flex items-center gap-4">
           <Link to="/profile" className="relative">
             <img
-              src={`https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=Artem?height=40&width=40`}
+              src={`https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${profile.email}?height=40&width=40`}
               alt="Profile"
               width={40}
               height={40}
