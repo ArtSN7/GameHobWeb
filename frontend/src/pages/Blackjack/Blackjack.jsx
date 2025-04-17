@@ -44,11 +44,6 @@ export default function BlackjackPage() {
   const [result, setResult] = useState(null);
   const [lastWin, setLastWin] = useState(0);
   const [insuranceBet, setInsuranceBet] = useState(0);
-  const [gameStats, setGameStats] = useState({
-    gamesPlayed: 0,
-    gamesWon: 0,
-    blackjackTotalWin: 0,
-  });
 
   useEffect(() => {
     if (!isAuthenticated) {
