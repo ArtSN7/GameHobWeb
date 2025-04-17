@@ -5,6 +5,7 @@ import HomePage from '@/pages/HomePage/Home.jsx';
 
 import BlackJack from '@/pages/Blackjack/BlackJack';
 import ScratchTheCardPage from '@/pages/Scratch/Scratch';
+import SlotsPage from '@/pages/Slots/Slots.jsx';
 
 import TermsPage from '@/pages/TermsAndConditions/Terms.jsx';
 import PrivacyPage from '@/pages/TermsAndConditions/Privacy.jsx';
@@ -26,6 +27,7 @@ export const routes = [
   // games
   { path: '/games/blackjack', Component: BlackJack },
   { path: '/games/scratch', Component: ScratchTheCardPage },
+  { path: '/games/slots', Component: SlotsPage },
 
   // terms and conditions
   { path: '/terms', Component: TermsPage },
