@@ -3,6 +3,8 @@ import SignupPage from '@/pages/Auth/Signup.jsx';
 
 import HomePage from '@/pages/HomePage/Home.jsx';
 
+import BlackJack from '@/pages/Blackjack/BlackJack';
+
 import TermsPage from '@/pages/TermsAndConditions/Terms.jsx';
 import PrivacyPage from '@/pages/TermsAndConditions/Privacy.jsx';
 
@@ -19,6 +21,9 @@ export const routes = [
 
   // main page
   { path: '/home', Component: HomePage },
+
+  // games
+  { path: '/games/blackjack', Component: BlackJack },
 
   // terms and conditions
   { path: '/terms', Component: TermsPage },
