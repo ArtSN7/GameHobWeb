@@ -121,6 +121,10 @@ export default function Bonuses({setShowCon}) {
     }
   };
 
+  if (bonuses.length === 0) {
+    return;
+  }
+
   return (
     <div>
       <h3 className="text-lg font-medium mb-3">Daily & Weekly Bonuses</h3>

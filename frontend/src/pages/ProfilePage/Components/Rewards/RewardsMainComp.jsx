@@ -2,13 +2,12 @@
 
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {  TabsContent,  } from "@/components/ui/tabs";
 import { Gift,} from "lucide-react";
-import { useEffect, useState } from "react";
+
 
 
 import Bonuses from "./Bonuses";
-
+import SpecialBonuses from "./SpecialBonuses";
 
 
 
@@ -26,10 +25,9 @@ export default function RewardsMainComp({setShowConfetti}) {
           </CardHeader>
           <CardContent className="space-y-6">
             <Bonuses setShowCon={setShowConfetti}  />
+            <SpecialBonuses setShowCon={setShowConfetti}  />
 
             {/*
-
-                <SpecialBonuses />
 
             <AvailableAds availableAds={availableAds} watchAd={watchAd} />
             <div className="mt-4 flex justify-center">
