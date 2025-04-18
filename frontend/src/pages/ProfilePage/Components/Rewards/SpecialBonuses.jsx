@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-export default function SpecialBonuses({ claimBonus, bonuses }) {
+export default function SpecialBonuses() {
   const specialBonus = {
     type: "special",
     title: "Special Bonus",
