@@ -53,6 +53,19 @@ export function UserProvider({ children }) {
     }
   };
 
+  const logout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setUser(null);
+      setProfile(null);
+      setIsAuthenticated(false);
+      setBalance(0);
+    } catch (error) {
+      console.error("Error signing out:", error.message);
+    }
+  };
+
   useEffect(() => {
     const initializeSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -110,6 +123,7 @@ export function UserProvider({ children }) {
     balance,
     setBalance,
     updateBalance,
+    logout,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

@@ -1,15 +1,24 @@
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Trophy } from "lucide-react"
 import {useUser} from "../../../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 import { format } from "date-fns";
 
 export default function ProfileHeader(){
 
-    const { user, profile, isLoading } = useUser();
+    const { user, profile, isLoading, logout } = useUser();
+
+    const navigate = useNavigate();
 
     if (isLoading || profile === null) {
       return null; // or a loading spinner
+    }
+
+    const handle_logout = async () => {
+        await logout();
+        navigate("/auth/login");
+        return;
     }
 
     const formattedDate = format(new Date(profile.created_at), "EEEE d MMMM yyyy");
@@ -44,6 +53,12 @@ export default function ProfileHeader(){
                   </>
                 }
               </div>
+              <button
+                  onClick={handle_logout}
+                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
+                >
+                  Logout
+                </button>
             </div>
           </CardContent>
         </Card>

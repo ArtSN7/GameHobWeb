@@ -191,7 +191,7 @@ export default function ProfilePage() {
         <ProfileHeader />
 
         <Tabs defaultValue="promocodes" className="mb-8">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="rewards" className="flex items-center gap-2">
               <Gift className="h-4 w-4" />
               Rewards
