@@ -11,6 +11,9 @@ import { supabase } from "./../../../../lib/supabase";
 import { useUser } from "../../../../context/UserContext"
 
 const getPromocodes = async () => {
+
+  // here we also need to perform a check if the user has already used this promocode
+  
   const { data, error } = await supabase
     .from("promo_codes")
     .select("*")
@@ -54,9 +57,13 @@ export default function Promocodes({ setShowConfetti }) {
       // Update balance with promocode value
       setBalance(balance + foundPromocode.price)
       await updateBalance(balance)
+      setShowConfetti(true)
+
+
+      // now we need to add the id of this promocode to the users array of used promocodes
     }
 
-    //setShowConfetti(true)
+    
   }
 
   return (

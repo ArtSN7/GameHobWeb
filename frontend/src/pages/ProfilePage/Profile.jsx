@@ -114,8 +114,8 @@ export default function ProfilePage() {
 }
 
 
-const ConfettiFunction = () => {
-  return (         
+const ConfettiFunction = (
+  <>     
   
   <div className="fixed inset-0 pointer-events-none z-50">
     {Array.from({ length: 50 }).map((_, i) => (
@@ -135,5 +135,5 @@ const ConfettiFunction = () => {
         transition={{ duration: Math.random() * 2 + 2, ease: "easeOut" }}
       />
     ))}
-  </div>);
-};
+  </div>
+  </>  );
