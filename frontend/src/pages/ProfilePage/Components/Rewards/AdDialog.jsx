@@ -8,10 +8,7 @@ import { motion } from "framer-motion"
 export default function AdDialog({ 
   showAdDialog, 
   setShowAdDialog, 
-  adPlaying, 
-  currentAd, 
-  adProgress, 
-  claimAdReward 
+
 }) {
   return (
     <Dialog open={showAdDialog} onOpenChange={setShowAdDialog}>

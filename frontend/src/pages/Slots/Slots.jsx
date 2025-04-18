@@ -50,6 +50,13 @@ export default function SlotsPage() {
   const [message, setMessage] = useState("Place your bet and spin");
   const [showPayoutNotes, setShowPayoutNotes] = useState(false);
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/auth/login");
+      return;
+    }
+  }, [isAuthenticated]);
+
 
   const reelControls = [useAnimation(), useAnimation(), useAnimation()];
   const spinInProgress = useRef(false);

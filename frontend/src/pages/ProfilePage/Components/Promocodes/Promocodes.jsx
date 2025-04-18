@@ -4,16 +4,61 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
 import { Check, AlertCircle } from "lucide-react"
+import { useState, useEffect } from "react"
 
-export default function Promocodes({ 
-  promocode, 
-  setPromocode, 
-  promocodeStatus, 
-  setPromocodeStatus, 
-  handleRedeemPromocode 
-}) {
+import { supabase } from "./../../../../lib/supabase";
+import { useUser } from "../../../../context/UserContext"
+
+const getPromocodes = async () => {
+  const { data, error } = await supabase
+    .from("promo_codes")
+    .select("*")
+  if (error) {
+    return []
+  }
+  return data
+}
+
+export default function Promocodes({ setShowConfetti }) {
+  const [promocode, setPromocode] = useState("")
+  const [promocodeStatus, setPromocodeStatus] = useState(false)
+  const [promocodeStatusSuccess, setPromocodeStatusSuccess] = useState(false)
+  const [promocodeData, setPromocodeData] = useState(null)
+  const { updateBalance, balance, setBalance} = useUser()
+
+  useEffect(() => {
+    if (promocodeStatus) {
+      const timer = setTimeout(() => {
+        setPromocodeStatus(false)
+        setPromocodeStatusSuccess(false)
+        setPromocodeData(null)
+      }, 5000) // Message disappears after 5 seconds
+      return () => clearTimeout(timer)
+    }
+  }, [promocodeStatus])
+
+  const handleRedeemPromocode = async () => {
+    const promocodes = await getPromocodes()
+    const foundPromocode = promocodes.find((code) => code.code === promocode)
+
+    if (!foundPromocode) {
+      setPromocodeStatus(true)
+      setPromocodeStatusSuccess(false)
+      setPromocodeData(null)
+      return
+    } else {
+      setPromocodeStatusSuccess(true)
+      setPromocodeStatus(true)
+      setPromocodeData(foundPromocode)
+      // Update balance with promocode value
+      setBalance(balance + foundPromocode.price)
+      await updateBalance(balance)
+    }
+
+    //setShowConfetti(true)
+  }
+
   return (
     <Card className="border-0 shadow-sm">
       <CardHeader>
@@ -26,15 +71,20 @@ export default function Promocodes({
 
         {promocodeStatus && (
           <Alert
-            variant={promocodeStatus.success ? "default" : "destructive"}
-            className={promocodeStatus.success ? "bg-green-50 border-green-200 text-green-800" : ""}
+            variant={promocodeStatusSuccess ? "default" : "destructive"}
+            className={promocodeStatusSuccess ? "bg-green-50 border-green-200 text-green-800" : ""}
           >
-            {promocodeStatus.success ? (
+            {promocodeStatusSuccess ? (
               <Check className="h-4 w-4" />
             ) : (
               <AlertCircle className="h-4 w-4" />
             )}
-            <AlertDescription>{promocodeStatus.message}</AlertDescription>
+
+            {promocodeStatusSuccess && promocodeData ? (
+              <AlertDescription>{`Promocode-${promocodeData.name} applied! You got ${promocodeData.price} coins!`}</AlertDescription>
+            ) : (
+              <AlertDescription>{"Invalid promocode!"}</AlertDescription>
+            )}
           </Alert>
         )}
 
@@ -52,23 +102,6 @@ export default function Promocodes({
           >
             Redeem
           </Button>
-        </div>
-
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-          <h3 className="font-medium text-blue-800 mb-2">Available Promocodes</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div className="flex items-center gap-2 bg-white p-2 rounded border border-blue-100">
-              <Badge className="bg-blue-500">BONUS100</Badge>
-              <span className="text-sm">1,000 coins bonus</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white p-2 rounded border border-blue-100">
-              <Badge className="bg-green-500">WELCOME500</Badge>
-              <span className="text-sm">500 coins bonus</span>
-            </div>
-          </div>
-          <p className="text-xs text-[#64748b] mt-2">
-            * For demonstration purposes only. In a real app, promocodes would not be displayed here.
-          </p>
         </div>
       </CardContent>
     </Card>
