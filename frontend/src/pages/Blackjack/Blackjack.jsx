@@ -139,11 +139,6 @@ export default function BlackjackPage() {
       setMessage("Bet must be between 10 and your current balance");
       return;
     }
-
-    setGameStats((prev) => ({
-      ...prev,
-      gamesPlayed: prev.gamesPlayed + 1,
-    }));
     
     setBalance((prev) => {
       const newBalance = prev - bet;
@@ -459,12 +454,6 @@ export default function BlackjackPage() {
     });
 
     const netResult = totalWin - totalLoss;
-    setGameStats((prev) => ({
-      ...prev,
-      gamesWon: netResult > 0 ? prev.gamesWon + 1 : prev.gamesWon,
-      blackjackTotalWin: netResult > 0 ? prev.blackjackTotalWin + netResult : prev.blackjackTotalWin,
-    }));
-
     setBalance((prev) => {
       const newBalance = prev + totalWin;
       return newBalance >= 0 ? newBalance : prev;

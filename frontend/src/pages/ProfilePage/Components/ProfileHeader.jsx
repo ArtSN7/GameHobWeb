@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 
 export default function ProfileHeader(){
-
     const { user, profile, isLoading, logout } = useUser();
 
     const navigate = useNavigate();
@@ -16,10 +15,13 @@ export default function ProfileHeader(){
     }
 
     const handle_logout = async () => {
-        await logout();
-        navigate("/auth/login");
-        return;
-    }
+      try {
+          await logout();
+          navigate("/auth/login");
+      } catch (error) {
+          console.error("Logout failed:", error.message);
+      }
+  }
 
     const formattedDate = format(new Date(profile.created_at), "EEEE d MMMM yyyy");
 
