@@ -37,7 +37,7 @@ export default function ProfilePage() {
       <main className="container px-4 py-8 max-w-4xl mx-auto">
         <ProfileHeader />
 
-        <Tabs defaultValue="promocodes" className="mb-8">
+        <Tabs defaultValue="rewards" className="mb-8">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="rewards" className="flex items-center gap-2">
               <Gift className="h-4 w-4" />
