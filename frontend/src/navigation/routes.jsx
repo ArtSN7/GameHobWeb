@@ -5,7 +5,7 @@ import HomePage from '@/pages/HomePage/Home.jsx';
 
 import ProfilePage from '@/pages/ProfilePage/Profile.jsx';
 
-import BlackJack from '@/pages/Blackjack/BlackJack';
+import BlackJack from '@/pages/Blackjack/Blackjack';
 import ScratchTheCardPage from '@/pages/Scratch/Scratch';
 import SlotsPage from '@/pages/Slots/Slots.jsx';
 import Plinko from '@/pages/Plinko/Plinko';
