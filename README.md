@@ -2,7 +2,25 @@
 
 Welcome to the **GameHob**, a modern, interactive gaming platform built with **React**, **Vite**, and **Tailwind CSS**, with robust backend integration via **Supabase**.
 
+<img width="725" alt="image" src="https://github.com/user-attachments/assets/9cb79984-677c-4837-9543-2029c8b416ed" />
 
+<img width="557" alt="image" src="https://github.com/user-attachments/assets/04a91887-b589-499f-b2c8-83e5d516c5ad" />
+
+<img width="1282" alt="image" src="https://github.com/user-attachments/assets/e2fc749f-cb1e-4ba6-aa8c-fda0dd4f4450" />
+
+<img width="1434" alt="image" src="https://github.com/user-attachments/assets/bc436bc0-f07e-4e50-a63b-0f916dde0646" />
+
+<img width="1446" alt="image" src="https://github.com/user-attachments/assets/4b0b85ad-5ab1-47e8-9224-c1dcda840bbb" />
+
+<img width="1151" alt="image" src="https://github.com/user-attachments/assets/537227da-1453-4db8-ad21-a4175dcadea5" />
+
+<img width="1425" alt="image" src="https://github.com/user-attachments/assets/71bb494b-5ade-4899-918b-e367fc301ef6" />
+
+<img width="1437" alt="image" src="https://github.com/user-attachments/assets/fc21cfb5-a353-4efa-a496-9ff2b1b3d865" />
+
+<img width="1447" alt="image" src="https://github.com/user-attachments/assets/7957299a-0010-4661-9360-1666afed5c78" />
+
+<img width="1433" alt="image" src="https://github.com/user-attachments/assets/ee6e22c0-7fd2-45ac-ad36-10f694ff5526" />
 
 ---
 
