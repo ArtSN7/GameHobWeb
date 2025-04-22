@@ -212,7 +212,7 @@ function CardFooterComp({ isLoading, handleOAuthLogin }) {
           type="button"
           className="flex items-center justify-center gap-2 border-gray-300 hover:bg-gray-50 h-12 sm:h-10 text-sm sm:text-base"
           onClick={() => handleOAuthLogin("apple")}
-          disabled={isLoading}
+          disabled={true}
         >
           <Apple className="h-4 w-4" />
           <span>Apple</span>
