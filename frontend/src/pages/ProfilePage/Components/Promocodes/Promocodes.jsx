@@ -4,12 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Check, AlertCircle } from "lucide-react"
+import { Check, AlertCircle, Tag } from "lucide-react"
 import { useState, useEffect } from "react"
-
-import { supabase } from "./../../../../lib/supabase";
+import { supabase } from "./../../../../lib/supabase"
 import { useUser } from "../../../../context/UserContext"
-
 
 const getPromocodes = async () => {
   const { data, error } = await supabase
@@ -24,43 +22,40 @@ const getPromocodes = async () => {
 }
 
 const AddPromoToUser = async (new_array, userId) => {
-  // Check if the user exists in the user_bonuses table
   const { data: existingUser, error: fetchError } = await supabase
     .from("user_bonuses")
     .select("id")
     .eq("user_id", userId)
-    .maybeSingle(); // Use maybeSingle to handle no rows case
+    .maybeSingle()
 
   if (fetchError) {
-    return false;
+    return false
   }
 
   if (existingUser) {
-    // User exists, update the promo_codes_id_array
     const { error: updateError } = await supabase
       .from("user_bonuses")
       .update({ promo_codes_id_array: new_array })
-      .eq("user_id", userId);
+      .eq("user_id", userId)
 
     if (updateError) {
-      return false;
+      return false
     }
-    return true;
+    return true
   } else {
-    // User doesn't exist, insert a new row
     const { error: insertError } = await supabase
       .from("user_bonuses")
       .insert({
         user_id: userId,
         promo_codes_id_array: new_array,
-        regular_bonuses_id_array: [], // Initialize other arrays as empty
-        special_bonuses_id_array: [], // Initialize other arrays as empty
-      });
+        regular_bonuses_id_array: [],
+        special_bonuses_id_array: [],
+      })
 
     if (insertError) {
-      return false;
+      return false
     }
-    return true;
+    return true
   }
 }
 
@@ -84,105 +79,107 @@ export default function Promocodes({ setShowConfetti }) {
   }, [promocodeStatus])
 
   const handleRedeemPromocode = async () => {
-    // Fetch promocodes from the database
-    const promocodes = await getPromocodes();
+    const promocodes = await getPromocodes()
+    const foundPromocode = promocodes.find((code) => code.code === promocode)
 
-    // Find the promocode in the database
-    const foundPromocode = promocodes.find((code) => code.code === promocode);
-
-    // If promocode doesn't exist, show error
     if (!foundPromocode) {
-      setPromocodeStatus(true);
-      setPromocodeStatusSuccess(false);
-      setPromocodeData(null);
-      setIsValid(false);
-      return;
+      setPromocodeStatus(true)
+      setPromocodeStatusSuccess(false)
+      setPromocodeData(null)
+      setIsValid(false)
+      return
     }
 
-    // Fetch user's promo_codes_id_array
     const { data: user_data, error } = await supabase
       .from("user_bonuses")
       .select("promo_codes_id_array")
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
 
     if (error) {
-      setPromocodeStatus(true);
-      setPromocodeStatusSuccess(false);
-      setPromocodeData(null);
-      setIsValid(false);
-      return;
+      setPromocodeStatus(true)
+      setPromocodeStatusSuccess(false)
+      setPromocodeData(null)
+      setIsValid(false)
+      return
     }
 
-    // Check if user has already used this promocode
-    const promoCodesArray = user_data[0]?.promo_codes_id_array || [];
+    const promoCodesArray = user_data[0]?.promo_codes_id_array || []
     if (promoCodesArray.includes(foundPromocode.id)) {
-      setPromocodeStatus(true);
-      setPromocodeStatusSuccess(false);
-      setPromocodeData(null);
-      setIsValid(false);
-      return;
+      setPromocodeStatus(true)
+      setPromocodeStatusSuccess(false)
+      setPromocodeData(null)
+      setIsValid(false)
+      return
     }
 
-    // Promocode is valid and not used, proceed with redemption
-    setPromocodeStatus(true);
-    setPromocodeStatusSuccess(true);
-    setPromocodeData(foundPromocode);
+    setPromocodeStatus(true)
+    setPromocodeStatusSuccess(true)
+    setPromocodeData(foundPromocode)
 
-    // Update balance
-    const newBalance = balance + foundPromocode.price;
-    setBalance(newBalance);
-    await updateBalance(newBalance);
+    const newBalance = balance + foundPromocode.price
+    setBalance(newBalance)
+    await updateBalance(newBalance)
 
-    // Show confetti
-    setShowConfetti(true);
+    setShowConfetti(true)
 
-    // Add promocode ID to user's promo_codes_id_array
-    const updatedPromoCodesArray = [...promoCodesArray, foundPromocode.id];
-    await AddPromoToUser(updatedPromoCodesArray, user.id);
-  };
+    const updatedPromoCodesArray = [...promoCodesArray, foundPromocode.id]
+    await AddPromoToUser(updatedPremiumCodesArray, user.id)
+  }
 
   return (
-    <Card className="border-0 shadow-sm">
+    <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-indigo-50 hover:shadow-xl transition-shadow duration-300">
       <CardHeader>
-        <CardTitle>Redeem Promocode</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-xl text-gray-800">
+          <Tag className="h-5 w-5 text-purple-500" />
+          Redeem Promocode
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-[#64748b]">
-          Enter a valid promocode to receive bonus coins or special rewards.
+      <CardContent className="space-y-6 p-6">
+        <p className="text-gray-600 text-sm leading-relaxed">
+          Enter a valid promocode to unlock bonus coins or exclusive rewards!
         </p>
 
         {promocodeStatus && (
           <Alert
             variant={promocodeStatusSuccess ? "default" : "destructive"}
-            className={promocodeStatusSuccess ? "bg-green-50 border-green-200 text-green-800" : ""}
+            className={`animate-in fade-in duration-300 ${
+              promocodeStatusSuccess
+                ? "bg-green-50 border-green-200 text-green-800"
+                : "bg-red-50 border-red-200 text-red-800"
+            }`}
           >
             {promocodeStatusSuccess ? (
               <Check className="h-4 w-4" />
             ) : (
               <AlertCircle className="h-4 w-4" />
             )}
-
-            {promocodeStatusSuccess && promocodeData ? (
-              <AlertDescription>{`Promocode-${promocodeData.name} applied! You got ${promocodeData.price} coins!`}</AlertDescription>
-            ) : (
-              <AlertDescription>{"Invalid promocode!"}</AlertDescription>
-            )}
+            <AlertDescription>
+              {promocodeStatusSuccess && promocodeData ? (
+                <>
+                  Success! Promocode <span className="font-semibold">{promocodeData.name}</span> applied. 
+                  You received <span className="font-semibold">{promocodeData.price}</span> coins!
+                </>
+              ) : (
+                "Invalid or already used promocode. Please try another."
+              )}
+            </AlertDescription>
           </Alert>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <div className="flex-1">
             <Input
               placeholder="Enter promocode"
               value={promocode}
               onChange={(e) => setPromocode(e.target.value)}
+              className="border-gray-300 focus:border-purple-500 focus:ring-purple-500 transition-all duration-200 h-11 rounded-lg"
             />
           </div>
-          <Button 
-            className="bg-blue-500 hover:bg-blue-600" 
+          <Button
             onClick={handleRedeemPromocode}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-lg transition-all duration-200 hover:scale-105"
           >
-            Redeem
+            Redeem Now
           </Button>
         </div>
       </CardContent>

@@ -1,9 +1,11 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Gift, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
-
 import { supabase } from "./../../../../lib/supabase";
-import { useUser } from "../../../../context/UserContext"
+import { useUser } from "../../../../context/UserContext";
 
 const getBonuses = async () => {
   const { data, error } = await supabase
@@ -36,7 +38,6 @@ const getBonusesNotUsed = async (userId, all_bonuses) => {
 };
 
 const AddBonusToUser = async (new_array, userId) => {
-  // Check if the user exists in the user_bonuses table
   const { data: existingUser, error: fetchError } = await supabase
     .from("user_bonuses")
     .select("id")
@@ -48,7 +49,6 @@ const AddBonusToUser = async (new_array, userId) => {
   }
 
   if (existingUser) {
-    // User exists, update the regular_bonuses_id_array
     const { error: updateError } = await supabase
       .from("user_bonuses")
       .update({ regular_bonuses_id_array: new_array })
@@ -59,14 +59,13 @@ const AddBonusToUser = async (new_array, userId) => {
     }
     return true;
   } else {
-    // User doesn't exist, insert a new row
     const { error: insertError } = await supabase
       .from("user_bonuses")
       .insert({
         user_id: userId,
         regular_bonuses_id_array: new_array,
-        promo_codes_id_array: [], // Initialize other arrays as empty
-        special_bonuses_id_array: [], // Initialize other arrays as empty
+        promo_codes_id_array: [],
+        special_bonuses_id_array: [],
       });
 
     if (insertError) {
@@ -76,7 +75,7 @@ const AddBonusToUser = async (new_array, userId) => {
   }
 };
 
-export default function Bonuses({setShowCon}) {
+export default function Bonuses({ setShowCon }) {
   const { user, updateBalance, balance, setBalance } = useUser();
   const [bonuses, setBonuses] = useState([]);
 
@@ -94,7 +93,6 @@ export default function Bonuses({setShowCon}) {
   }, [user]);
 
   const claimBonus = async (bonus) => {
-    // Fetch the current regular_bonuses_id_array
     const { data: user_data, error } = await supabase
       .from("user_bonuses")
       .select("regular_bonuses_id_array")
@@ -108,42 +106,53 @@ export default function Bonuses({setShowCon}) {
     const regularBonusesArray = user_data[0]?.regular_bonuses_id_array || [];
     const updatedBonusesArray = [...regularBonusesArray, bonus.id];
 
-    // Add the bonus to the user's regular_bonuses_id_array
     const success = await AddBonusToUser(updatedBonusesArray, user.id);
     if (success) {
-      // Update the local state to reflect the claimed bonus
       setBonuses(bonuses.filter(b => b.id !== bonus.id));
-      setShowCon(true); // Show confetti animation
+      setShowCon(true);
       const newBalance = balance + bonus.price;
       setBalance(newBalance);
       await updateBalance(newBalance);
-  
     }
   };
 
-  if (bonuses.length === 0) {
-    return;
-  }
-
   return (
-    <div>
-      <h3 className="text-lg font-medium mb-3">Daily & Weekly Bonuses</h3>
-      <Card className="border-0 shadow-sm">
-        <CardContent className="p-4 space-y-4">
+    <div className="transition-all duration-300">
+      <h3 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
+        <Sparkles className="h-5 w-5 text-blue-500" />
+        Daily & Weekly Bonuses
+      </h3>
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 hover:shadow-xl transition-shadow duration-300">
+        <CardContent className="p-6">
           {bonuses.length === 0 ? (
-            <p>No bonuses available to claim.</p>
+            <div className="text-center py-8">
+              <Gift className="h-12 w-12 text-blue-400 mx-auto mb-4 animate-bounce" />
+              <p className="text-gray-600 mb-2">No bonuses available right now</p>
+              <p className="text-sm text-gray-500">Check back tomorrow for new rewards!</p>
+            </div>
           ) : (
-            bonuses.map(bonus => (
-              <div key={bonus.id} className="flex justify-between items-center">
-                <span>{bonus.title} - {bonus.price} Coins</span>
-                <Button
-                  onClick={() => claimBonus(bonus)}
-                  className="bg-blue-500 hover:bg-blue-600"
+            <div className="space-y-4">
+              {bonuses.map(bonus => (
+                <div
+                  key={bonus.id}
+                  className="flex justify-between items-center p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-colors duration-200"
                 >
-                  Claim
-                </Button>
-              </div>
-            ))
+                  <div className="flex items-center gap-3">
+                    <Gift className="h-5 w-5 text-blue-500" />
+                    <div>
+                      <span className="font-medium text-gray-800">{bonus.title}</span>
+                      <span className="text-sm text-gray-600 ml-2">+{bonus.price} Coins</span>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => claimBonus(bonus)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-full transition-all duration-200 hover:scale-105"
+                  >
+                    Claim Now
+                  </Button>
+                </div>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>

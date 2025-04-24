@@ -61,8 +61,6 @@ export default function ProfilePage() {
         </Tabs>
       </main>
 
-      <Footer />
-
       {/* Ad Dialog for playing AD */}
 
       {/*
