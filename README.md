@@ -20,7 +20,11 @@ Welcome to the **GameHob**, a modern, interactive gaming platform built with **R
 
 <img width="1447" alt="image" src="https://github.com/user-attachments/assets/7957299a-0010-4661-9360-1666afed5c78" />
 
-<img width="1433" alt="image" src="https://github.com/user-attachments/assets/ee6e22c0-7fd2-45ac-ad36-10f694ff5526" />
+<img width="950" alt="image" src="https://github.com/user-attachments/assets/4dbfac85-b01e-478d-b6fe-4610ed13c938" />
+
+<img width="1085" alt="image" src="https://github.com/user-attachments/assets/9b46bd27-a992-49b1-a2df-329385cc2f02" />
+
+
 
 ---
 
