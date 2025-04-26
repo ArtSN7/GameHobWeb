@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,11 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Loader2, Apple, Chrome, Spade } from "lucide-react";
+import { AlertCircle, Loader2, Apple, Chrome, Spade, CheckCircle } from "lucide-react"; // Added CheckCircle
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { useUser } from "@/context/UserContext";
-
 
 export default function SignUpPage() {
   const navigate = useNavigate();
@@ -19,8 +16,8 @@ export default function SignUpPage() {
   const [formEmail, setFormEmail] = useState("");
   const [formPassword, setFormPassword] = useState("");
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState(""); // New state for success message
   const [isLoading, setIsLoading] = useState(false);
-
 
   // Redirect authenticated users after render
   useEffect(() => {
@@ -32,6 +29,7 @@ export default function SignUpPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage(""); // Clear previous success message
 
     if (!formEmail || !formPassword) {
       setError("Please fill in all fields");
@@ -40,13 +38,22 @@ export default function SignUpPage() {
 
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: formEmail,
         password: formPassword,
       });
 
       if (error) throw error;
-      navigate("/home"); // Redirect to homepage after successful sign-up
+
+      // Check if session is null, indicating email verification is required
+      if (!data.session) {
+        setSuccessMessage(
+          "Registration successful! Please check your email to verify your account."
+        );
+      } else {
+        // If session exists, user is logged in immediately (e.g., email verification disabled)
+        navigate("/home");
+      }
     } catch (err) {
       setError(err.message || "Failed to create account");
     } finally {
@@ -100,6 +107,12 @@ export default function SignUpPage() {
                 <Alert variant="destructive" className="mb-4 text-sm">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              {successMessage && (
+                <Alert variant="default" className="mb-4 text-sm border-green-500 text-green-700">
+                  <CheckCircle className="h-4 w-4" />
+                  <AlertDescription>{successMessage}</AlertDescription>
                 </Alert>
               )}
               <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
@@ -172,6 +185,7 @@ export default function SignUpPage() {
   );
 }
 
+// CardFooterComp remains unchanged
 function CardFooterComp({ isLoading, handleOAuthLogin }) {
   const navigate = useNavigate();
 
