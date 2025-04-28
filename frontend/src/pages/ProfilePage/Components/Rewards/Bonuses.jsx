@@ -123,12 +123,12 @@ export default function Bonuses({ setShowCon }) {
         Daily & Weekly Bonuses
       </h3>
       <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 hover:shadow-xl transition-shadow duration-300">
-        <CardContent className="p-6">
+        <CardContent className="p-4"> {/* Reduced padding from p-6 to p-4 */}
           {bonuses.length === 0 ? (
-            <div className="text-center py-8">
-              <Gift className="h-12 w-12 text-blue-400 mx-auto mb-4 animate-bounce" />
-              <p className="text-gray-600 mb-2">No bonuses available right now</p>
-              <p className="text-sm text-gray-500">Check back tomorrow for new rewards!</p>
+            <div className="text-center py-4"> {/* Reduced from py-8 to py-4 */}
+              <Gift className="h-8 w-8 text-blue-400 mx-auto mb-2 animate-bounce" /> {/* Reduced icon size from h-12 w-12 to h-8 w-8 */}
+              <p className="text-gray-600 text-sm mb-1">No bonuses available</p> {/* Reduced text size and margin */}
+              <p className="text-xs text-gray-500">Check back tomorrow!</p> {/* Reduced text size and simplified text */}
             </div>
           ) : (
             <div className="space-y-4">
