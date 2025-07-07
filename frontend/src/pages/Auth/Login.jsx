@@ -57,7 +57,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `https://game-hob-web.vercel.app/`,
+          redirectTo: `${window.location.origin}/`,
         },
       });
 
