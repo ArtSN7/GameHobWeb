@@ -57,7 +57,9 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/`, // https://game-hob-web.vercel.app
+
+          // go to the 
         },
       });
 
@@ -218,7 +220,11 @@ function CardFooterComp({ isLoading, handleOAuthLogin }) {
           <span>Apple</span>
         </Button>
       </div>
-      <div className="relative w-full">
+
+
+      {/*
+
+            <div className="relative w-full">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-200"></div>
         </div>
@@ -233,6 +239,8 @@ function CardFooterComp({ isLoading, handleOAuthLogin }) {
       >
         Create an account
       </Button>
+    
+      */}
     </CardFooter>
   );
 }
